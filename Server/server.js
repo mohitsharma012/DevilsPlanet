@@ -14,10 +14,16 @@ import cartRoute from './Routes/cartRoute.js';
 const app = express();                  
 dotenv.config();
 
-
+const corsOptions = {
+  origin: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+};
+app.use(cors(
+corsOptions
+));
 // middlewares
 app.use(express.json())
-app.use(cors())
 app.use(express.urlencoded({ extended: true }));
 
 // database connection
