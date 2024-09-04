@@ -15,7 +15,7 @@ const app = express();
 dotenv.config();
 
 const corsOptions = {
-  origin: 'https://devils-planet-bu1aiydse-mohits-projects-ed99787c.vercel.app',
+  origin: 'https://devils-planet-10mqaool6-mohits-projects-ed99787c.vercel.app',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true, // Allow cookies to be sent with requests
 };
