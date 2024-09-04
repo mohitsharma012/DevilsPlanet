@@ -14,13 +14,15 @@ import cartRoute from "./Routes/cartRoute.js";
 const app = express();
 dotenv.config();
 
-const corsOptions = {
-  origin: 'https://devils-planet-10mqaool6-mohits-projects-ed99787c.vercel.app',
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true, // Allow cookies to be sent with requests
-};
+// Allow all origins
+app.use(cors());
 
-app.use(cors(corsOptions));
+// or for more control
+const corsOptions = {
+  origin: '*', // Allow all origins
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true, // If you need to allow credentials (cookies, etc.)
+};
 
 
 // middlewares
