@@ -23,6 +23,8 @@ const corsOptions = {
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true, // If you need to allow credentials (cookies, etc.)
 };
+app.use(cors(corsOptions));
+
 
 
 // middlewares
