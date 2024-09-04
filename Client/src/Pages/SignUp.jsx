@@ -30,7 +30,7 @@ const SignUp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevents default form submission behavior
     try {
-      const Url = import.meta.env.VITE_BACKEND_URL + "/register";
+      const Url = import.meta.env.VITE_BACKEND_URL + "/user/register";
       const response = await fetch(Url, {
         method: "POST",
         headers: {
