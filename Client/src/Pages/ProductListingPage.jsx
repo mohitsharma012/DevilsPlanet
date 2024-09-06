@@ -45,8 +45,8 @@ const DifferentProductsPage = (props) => {
           <div class="mt-6 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
             {products.map((product) => (
               <Link to={`/product/${product._id}`} class="group relative">
-                <div class="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
-                  <img src={product.image} alt="Image" />
+                <div class=" rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 w-40 h-60 lg:h-80 lg:w-60">
+                  <img src={product.image} className="w-40 h-60 lg:h-80 lg:w-60" alt="Image" />
                 </div>
                 <div class="mt-4 flex justify-between">
                   <div>
