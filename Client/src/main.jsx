@@ -10,6 +10,7 @@ import DashboardPage from './Pages/dashboardPage'
 import ProductListingPage from './Pages/ProductListingPage'
 import ProductDetailPage from './Pages/ProductDetailPage'
 import ErrorPage from './Pages/404/errorPage'
+import CheckoutPage from './Pages/checkoutPage'
 
 const router = createBrowserRouter([
   { path: '/', element: <IndexPage /> },
@@ -20,6 +21,7 @@ const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
   { path : '/signup', element: <SignUp /> },
   { path : '/dashboard', element: <DashboardPage /> },
+  { path : '/checkout', element: <CheckoutPage /> },
   { path : '*', element: <ErrorPage /> },
 
 ])

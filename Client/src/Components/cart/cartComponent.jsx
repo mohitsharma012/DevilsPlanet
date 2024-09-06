@@ -12,73 +12,78 @@ export default function CartPage() {
   const [open, setOpen] = useState(true);
   const [cartItems, setCartItems] = useState([]);
 
-  //To retrieve the cart items from the backend and then retrive their data from the products collection
-  useEffect(() => {
-    const fetchCart = async () => {
-      try {
-        fetch(`${import.meta.env.VITE_BACKEND_URL}/cart/get-cart`, {
+  // Function to fetch the product details by id
+  const fetchProductDetails = async (productId) => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/product/products/${productId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching product details:", error);
+    }
+  };
+  // Function to fetch the cart items
+  const fetchCart = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/cart/get-cart`,
+        {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
             token: localStorage.getItem("token"),
           },
+        }
+      );
+      const data = await response.json();
+      const cartItemsWithDetails = await Promise.all(
+        data.cartItems.map(async (item) => {
+          const productDetails = await fetchProductDetails(item.productId);
+          return {
+            ...item,
+            id: item._id,
+            ...productDetails,
+            quantity: item.qty,
+          };
         })
-          .then((response) => response.json())
-          .then((data) => {
-            data.cartItems.map(async (item) => {
-            
-              try {            
-                const response = await fetch(
-                  import.meta.env.VITE_BACKEND_URL + `/product/products/${item.productId}`,
-                  {
-                    method: "GET",
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                  }
-                );
-                const data = await response.json();
-                setCartItems((prevItems) => [...prevItems, { ...data, quantity: item.qty, size: item.size }]);                
-              } catch (error) {
-                console.error("Error fetching product:", error);   
-              }   
-            });
-          });
-      } catch (error) {
-        console.error("Error fetching cart:", error);
-      }
-    };
-    fetchCart();
-  }, []);
-
-
-  const handleRemoveItem = (productId) => async () => {
-    if (isLogin) {
-      try {
-        await fetch("http://localhost:5000/api/cart", {
+      );
+      setCartItems(cartItemsWithDetails);
+    } catch (error) {
+      console.error("Error fetching cart:", error);
+    }
+  };
+  // Function to remove an item from the cart
+  const handleRemoveItem = (id) => async () => {
+    try {
+      await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/cart/remove/${id}`,
+        {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
+            token: localStorage.getItem("token"),
           },
-          body: JSON.stringify({ productId }),
-        });
-        setCartData((prevCartData) =>
-          prevCartData.filter((product) => product.id !== productId)
-        );
-      } catch (error) {
-        console.error("Error removing item from cart:", error);
-      }
-    } else {
-      const localCart = JSON.parse(localStorage.getItem("cart")) || [];
-      const updatedLocalCart = localCart.filter(
-        (product) => product.productId !== productId
+        }
       );
-      localStorage.setItem("cart", JSON.stringify(updatedLocalCart));
-      setCartData((prevCartData) =>
-        prevCartData.filter((product) => product.id !== productId)
-      );
+      fetchCart();
+    } catch (error) {
+      console.error("Error removing item from cart:", error);
     }
   };
+
+  // Fetch cart items on component mount
+  useEffect(() => {
+    fetchCart();
+  }, []);
+
 
   return (
     <Dialog open={open} onClose={setOpen} className="relative z-20">
@@ -172,20 +177,14 @@ export default function CartPage() {
                 </div>
 
                 <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
-                  <div className="flex justify-between text-base font-medium text-gray-900">
-                    <p>Subtotal</p>
-                    <p>$262.00</p>
-                  </div>
-                  <p className="mt-0.5 text-sm text-gray-500">
-                    Shipping and taxes calculated at checkout.
-                  </p>
+                  
                   <div className="mt-6">
-                    <a
+                    <Link to={"/checkout"}
                       href="#"
                       className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
                     >
                       Checkout
-                    </a>
+                    </Link>
                   </div>
                   <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
                     <p>

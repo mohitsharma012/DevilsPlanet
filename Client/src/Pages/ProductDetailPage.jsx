@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { StarIcon } from "@heroicons/react/20/solid";
-import { Radio, RadioGroup } from "@headlessui/react";
 import { useParams } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
 
 import Navbar from "../Components/Navbar/NavbarComponent";
-import IndexBestSellerComponent from "../Components/Index/IndexBestSellerComponents";
+import ProductShowcase from "../Components/ProductShowcaseComponent/ProductShowcase";
 import Footer from "../Components/Footer/FooterComponent";
 
 function classNames(...classes) {
@@ -14,82 +14,104 @@ function classNames(...classes) {
 export default function Example() {
   const [selectedSize, setSelectedSize] = useState("S");
   const [Product, setProduct] = useState({});
-
   const { productId } = useParams();
-  const [isLogin, setisLogin] = useState(true);
+  const [isLogin, setisLogin] = useState(false);
 
+  // Function to handle the size option change
   const handleOptionChange = (event) => {
     setSelectedSize(event.target.value);
   };
-
-  useEffect(() => {
-    // fetch product by id
-    const fetchProduct = async () => {
-      try {
-        const response = await fetch(
-          import.meta.env.VITE_BACKEND_URL + `/product/products/${productId}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        const data = await response.json();
-        setProduct(data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchProduct();
-  }, [productId]);
-
-  const handleAddToCart = () => {
-        if (isLogin) {
-            fetch(`${import.meta.env.VITE_BACKEND_URL}/cart/add-to-cart`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    token: localStorage.getItem("token"),
-                },
-                body: JSON.stringify({
-                    productId: Product._id,
-                    size: selectedSize,
-                    qty: 1,
-                }),
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    console.log(data);
-                    // Update the cartItems state with the new item
-                    setCartItems(prevItems => [...prevItems, data]);
-                })
-                .catch((error) => {
-                    console.error("Error:", error);
-                });
-        } else {
-            let cart = localStorage.getItem("cart");
-            cart = cart ? JSON.parse(cart) : [];
-
-            const index = cart.findIndex((item) => item.productId === Product._id && item.size === selectedSize.name);
-            if (index !== -1) {
-                cart[index].quantity += 1;
-            } else {
-                cart.push({
-                    productId: Product._id,
-                    quantity: 1,
-                    size: selectedSize.name,
-                });
-            }
-
-            localStorage.setItem("cart", JSON.stringify(cart));
-            setCartItems(cart);
+  // Function to fetch the product details by id
+  const fetchProduct = async () => {
+    try {
+      const response = await fetch(
+        import.meta.env.VITE_BACKEND_URL + `/product/products/${productId}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
         }
-    };
+      );
+      const data = await response.json();
+      setProduct(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // Function to check if the user is logged in
+  const checkLoginStatus = async () => {
+    try {
+      const response = await fetch(
+        import.meta.env.VITE_BACKEND_URL + "/user/is-logged-in",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            token: localStorage.getItem("token"),
+          },
+        }
+      );
+      const data = await response.json();
+      if (data.success) {
+        setisLogin(true);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  // Function to add the product to the cart
+  const handleAddToCart = async (event) => {
+    event.preventDefault(); // Prevent form from submitting and reloading the page
+    try {
+      // If user is not logged in, show alert and stop execution
+      if (!isLogin) {
+        toast("Please login to add product to cart");
+        return;
+      }
+
+      // Add product to cart
+      const response = await fetch(
+        import.meta.env.VITE_BACKEND_URL + "/cart/add-to-cart",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            token: localStorage.getItem("token"),
+          },
+          body: JSON.stringify({
+            productId: Product._id,
+            size: selectedSize,
+            qty: 1,
+          }),
+        }
+      );
+
+      // Check for successful response
+      if (!response.ok) {
+        throw new Error("Failed to add product to cart");
+      }
+
+      const data = await response.json();
+      // Handle success response (e.g., show a success toast)
+      toast("Product added to cart");
+    } catch (error) {
+      // Log error and show error message
+      console.error("Error adding to cart:", error);
+      toast("Error adding product to cart");
+    }
+  };
+
+  // Fetch product details and check login status on component mount
+  useEffect(() => {
+    checkLoginStatus();
+    fetchProduct();
+  }, []);
 
   return (
     <>
       <Navbar />
+      <ToastContainer theme="dark" />
       <div className="bg-white pt-20 w-full">
         <div className="pt-6 flex flex-col mx-3  md:w-3/4  md:mx-auto gap-5 md:flex-row">
           {/* Image gallery */}
@@ -206,7 +228,8 @@ export default function Example() {
           </div>
         </div>
       </div>
-      <IndexBestSellerComponent></IndexBestSellerComponent>
+      <ProductShowcase showcaseName="Bestsellers" />
+
       <Footer />
     </>
   );

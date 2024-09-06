@@ -15,7 +15,7 @@ const indexMainComponent = () => {
               </h2>
               <Link
                 to={"/allProducts"}
-                class=" mx-auto mt-16 text-lg  px-7 py-2 rounded bg-red-500 hover:bg-red-700 text-white"
+                class=" mx-auto mt-16 text-base  px-7 py-3 rounded bg-red-500 hover:bg-red-700 text-white"
               >
                 Shop Collection
               </Link>

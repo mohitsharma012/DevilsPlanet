@@ -2,10 +2,12 @@ import userModel from "../Models/usersModel.js";
 import bcrypt from "bcrypt";
 import validator from "validator";
 import jwt from "jsonwebtoken";
+import { set } from "mongoose";
 
 // Function to Login user
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
+
   try {
     // Check if all fields are entered
     if (!email || !password) {
@@ -15,7 +17,7 @@ const loginUser = async (req, res) => {
     // Check if user exists
     const user = await userModel.findOne({ email });
     if (!user) {
-      return res.json({ success: false, message: "User does not exist" });
+      return res.json({ success: false, message: "User does not exist"});
     }
 
     // Compare password with hashed password in database
@@ -29,10 +31,10 @@ const loginUser = async (req, res) => {
         res.json({
           success: true,
           message: "User logged in successfully",
-          token,
+          token
         });
       } else {
-        res.status(400).json({ success: false, message: "Email or Password is incorrect" });
+        res.status(400).json({ success: false, message: "Email or Password is incorrect"});
       }
     });
   } catch (error) {
@@ -63,6 +65,7 @@ const registerUser = async (req, res) => {
         message: "Please enter a valid email",
       });
     }
+    
     if (password.length < 8) {
       return res.json({
         success: false,

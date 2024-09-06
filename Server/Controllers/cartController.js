@@ -64,10 +64,14 @@ const removeFromCart = async (req, res) => {
 
     const cart = await cartModel.findOne({ userId });
     if (cart) {
-      console.log(cart);
-      cart.cartItems = cart.cartItems.filter((item) => (item.productId != id));
+      const index = cart.cartItems.findIndex((item) => item._id == id);
+      if (index === -1) {
+        return res.json({ message: "Item not found in cart" });
+      }
+      cart.cartItems.splice(index, 1);
       await cart.save();
-      return res.json({ success: true, message: "Item removed from cart" });
+      return res.json({ message: "Item removed from cart" });
+      
     } else {
       return res.json({ message: "Cart is empty" });
     }

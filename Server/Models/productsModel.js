@@ -7,6 +7,7 @@ const productSchema = new mongoose.Schema({
     price: { type: Number, required: true },
     image: { type: String, required: true },
     countInStock: { type: Number, required: true },
+    showcases: [{ type: String, enum: ["Bestsellers", "Recommended", "New Arrivals", "Featured"] }], 
 }, { minimize: false })
 
 const productModel = mongoose.models.product || mongoose.model("product", productSchema);
